@@ -1,0 +1,3 @@
+[build]
+  command = "cd brief-platform && npm run build"
+  publish = "brief-platform/dist"
