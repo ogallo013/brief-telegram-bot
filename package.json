@@ -1,16 +1,26 @@
 {
-  "name": "brief-telegram-bot-koyeb",
-  "version": "1.0.1",
-  "description": "Brief 10.0 Telegram Bot Server",
-  "main": "index.js",
+  "name": "brief-platform",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
   "scripts": {
-    "start": "node index.js"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "node-telegram-bot-api": "^0.66.0"
+    "lucide-react": "^0.475.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@supabase/supabase-js": "^2.48.1"
   },
-  "engines": {
-    "node": ">=18.0.0"
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.6",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.3",
+    "vite": "^6.4.3",
+    "tailwindcss": "^4.0.6"
   }
 }
