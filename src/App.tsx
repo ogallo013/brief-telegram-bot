@@ -29,6 +29,14 @@ import {
 } from 'lucide-react';
 
 // ============================================================================
+const COLORS = {
+  background: '#0B1110',
+  surface: '#111A17',
+  border: '#1D2A25',
+  primary: '#F2F5F3',
+  muted: '#8B9992',
+  accent: '#B8FF3D',
+};
 // 1. TYPES & ENUMS
 // ============================================================================
 export type ObjectType =
