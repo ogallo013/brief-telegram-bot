@@ -547,4 +547,51 @@ export function App() {
         {activeTab === 'stream' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredObjects.map((obj) => (
-              <div key={obj.id} onClick={() => setSelectedObjectForDetail(obj)} className="bg-[#10211
+              <div key={obj.id} onClick={() => setSelectedObjectForDetail(obj)} className="bg-[#102117] border border-[#1E3A2A] hover:border-[#235F45] rounded-2xl overflow-hidden shadow-xl group cursor-pointer flex flex-col justify-between">
+                <div>
+                  {obj.imageUrl && (
+                    <div className="relative h-44 w-full bg-[#09150E]">
+                      <img src={obj.imageUrl} alt={obj.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90" />
+                      <div className="absolute top-3 left-3 flex items-center gap-2">
+                        <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-[#09150E]/80 text-[#00FF42] border border-[#235F45]">{obj.category}</span>
+                        {obj.metadata?.statusBadge && <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#00FF42] text-[#09150E]">{obj.metadata.statusBadge}</span>}
+                      </div>
+                      {obj.metadata?.price !== undefined && (
+                        <span className="absolute bottom-2 right-3 text-[#00FF42] font-mono text-sm font-extrabold bg-[#09150E]/80 px-2 py-0.5 rounded border border-[#235F45]">
+                          {obj.metadata.currency || 'KES'} {obj.metadata.price.toLocaleString()}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="p-3.5 space-y-1.5">
+                    <h3 className="text-base font-extrabold text-[#E2ECE5] group-hover:text-[#00FF42] line-clamp-1">{obj.title}</h3>
+                    <p className="text-xs text-[#8DCF74] line-clamp-2">{obj.summary}</p>
+                  </div>
+                </div>
+
+                <div className="p-3.5 pt-0 flex items-center gap-2 border-t border-[#1E3A2A] mt-2">
+                  <button onClick={(e) => { e.stopPropagation(); handleExecuteProtocolAction('book', obj); }} className="flex-1 bg-[#00FF42] hover:bg-[#8DCF74] text-[#09150E] font-extrabold text-xs py-2 rounded-xl transition flex items-center justify-center gap-1 cursor-pointer">
+                    <span>Act</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                  <button onClick={(e) => { e.stopPropagation(); handleExecuteProtocolAction('save', obj); }} className="p-2 rounded-xl bg-[#172D20] text-[#8DCF74] border border-[#1E3A2A] hover:bg-[#235F45] cursor-pointer">
+                    <Bookmark className="w-4 h-4 fill-current" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+      </main>
+
+      <footer className="border-t border-[#1E3A2A] mt-12 py-6 text-xs text-[#86935C] text-center font-mono">
+        Brief 10.0 • Everything Happening Around You
+      </footer>
+
+    </div>
+  );
+}
+
+export default App;
