@@ -547,5 +547,242 @@ export function App() {
         {/* Cards Stream */}
         {activeTab === 'stream' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+
             {filteredObjects.map((obj) => (
-              <div key={obj.id} onClick={() => setSelectedObjectForDetai
+              <div
+                key={obj.id}
+                onClick={() => setSelectedObjectForDetail(obj)}
+                className="bg-[#102117] border border-[#235F45] rounded-2xl overflow-hidden cursor-pointer hover:border-[#00FF42] transition-all"
+              >
+                {obj.imageUrl && (
+                  <img
+                    src={obj.imageUrl}
+                    alt={obj.title}
+                    className="w-full h-44 object-cover"
+                  />
+                )}
+
+                <div className="p-4">
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <span className="text-[10px] uppercase tracking-wider font-extrabold text-[#00FF42]">
+                      {obj.category}
+                    </span>
+
+                    {obj.isVerified && (
+                      <ShieldCheck className="w-4 h-4 text-[#00FF42]" />
+                    )}
+                  </div>
+
+                  <h2 className="font-extrabold text-base text-[#E2ECE5] mb-2">
+                    {obj.title}
+                  </h2>
+
+                  <p className="text-xs text-[#9FB3A6] leading-relaxed mb-4">
+                    {obj.summary}
+                  </p>
+
+                  <div className="flex items-center justify-between gap-3 text-[11px] text-[#86935C]">
+                    <span className="flex items-center gap-1">
+                      <MapPin className="w-3.5 h-3.5" />
+                      {obj.locationName || 'Nairobi'}
+                    </span>
+
+                    {obj.metadata?.rating && (
+                      <span>
+                        ★ {obj.metadata.rating}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {activeTab === 'companion' && (
+          <section className="bg-[#102117] border border-[#235F45] rounded-2xl p-5">
+            <h2 className="font-extrabold text-lg mb-2">My Layer</h2>
+            <p className="text-sm text-[#9FB3A6] mb-5">
+              Things you've discovered, saved, contacted, booked or bought.
+            </p>
+
+            <div className="space-y-3">
+              {relationships.map((relationship) => {
+                const object = objects.find(
+                  (item) => item.id === relationship.targetId
+                );
+
+                return (
+                  <div
+                    key={relationship.id}
+                    className="border border-[#235F45] rounded-xl p-3"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-sm">
+                        {object?.title || relationship.targetId}
+                      </span>
+
+                      <span className="text-[10px] uppercase text-[#00FF42]">
+                        {relationship.state}
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-[#86935C] mt-1">
+                      {relationship.verb}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {activeTab === 'journeys' && (
+          <section className="space-y-4">
+            {journeys.map((journey) => (
+              <div
+                key={journey.id}
+                className="bg-[#102117] border border-[#235F45] rounded-2xl p-5"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <span className="text-[10px] uppercase font-extrabold text-[#00FF42]">
+                      {journey.category}
+                    </span>
+
+                    <h2 className="font-extrabold text-lg mt-1">
+                      {journey.title}
+                    </h2>
+
+                    <p className="text-xs text-[#9FB3A6] mt-2">
+                      {journey.description}
+                    </p>
+                  </div>
+
+                  <span className="text-sm font-extrabold text-[#00FF42]">
+                    {journey.progressPercent}%
+                  </span>
+                </div>
+
+                <div className="mt-4 h-2 bg-[#09150E] rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-[#00FF42]"
+                    style={{ width: `${journey.progressPercent}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </section>
+        )}
+
+        {activeTab === 'health' && (
+          <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              ['Opportunities', townHealth.opportunitiesActedOn],
+              ['Businesses Helped', townHealth.businessesHelped],
+              ['Events', townHealth.eventsAttended],
+              ['Knowledge', townHealth.knowledgeResolved],
+            ].map(([label, value]) => (
+              <div
+                key={label}
+                className="bg-[#102117] border border-[#235F45] rounded-2xl p-4"
+              >
+                <div className="text-2xl font-extrabold text-[#00FF42]">
+                  {value}
+                </div>
+                <div className="text-xs text-[#86935C] mt-1">
+                  {label}
+                </div>
+              </div>
+            ))}
+          </section>
+        )}
+
+        {selectedObjectForDetail && (
+          <div
+            className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4"
+            onClick={() => setSelectedObjectForDetail(null)}
+          >
+            <div
+              className="w-full max-w-lg bg-[#102117] border border-[#235F45] rounded-2xl overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {selectedObjectForDetail.imageUrl && (
+                <img
+                  src={selectedObjectForDetail.imageUrl}
+                  alt={selectedObjectForDetail.title}
+                  className="w-full h-52 object-cover"
+                />
+              )}
+
+              <div className="p-5">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <span className="text-[10px] uppercase font-extrabold text-[#00FF42]">
+                      {selectedObjectForDetail.category}
+                    </span>
+
+                    <h2 className="text-xl font-extrabold mt-1">
+                      {selectedObjectForDetail.title}
+                    </h2>
+                  </div>
+
+                  <button
+                    onClick={() => setSelectedObjectForDetail(null)}
+                    className="p-2 rounded-xl border border-[#235F45]"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <p className="text-sm text-[#9FB3A6] mt-4">
+                  {selectedObjectForDetail.summary}
+                </p>
+
+                {selectedObjectForDetail.locationName && (
+                  <div className="flex items-center gap-2 text-xs text-[#86935C] mt-4">
+                    <MapPin className="w-4 h-4" />
+                    {selectedObjectForDetail.locationName}
+                  </div>
+                )}
+
+                <button
+                  onClick={() => {
+                    handleExecuteProtocolAction(
+                      'save',
+                      selectedObjectForDetail
+                    );
+                    setSelectedObjectForDetail(null);
+                  }}
+                  className="w-full mt-5 bg-[#00FF42] text-[#09150E] rounded-xl py-3 text-sm font-extrabold"
+                >
+                  Save to My Layer
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {architectMode && (
+          <div className="fixed bottom-5 left-5 right-5 z-40 bg-[#102117] border border-[#00FF42] rounded-2xl p-4 shadow-2xl">
+            <div className="flex items-center gap-2 text-[#00FF42] font-extrabold text-sm">
+              <Terminal className="w-4 h-4" />
+              Architect Mode
+            </div>
+
+            <p className="text-xs text-[#9FB3A6] mt-2">
+              Local Layer protocol active. Objects, relationships and
+              workflows are connected.
+            </p>
+          </div>
+        )}
+      </main>
+
+      <footer className="border-t border-[#1E3A2A] py-5 text-center text-[10px] text-[#86935C]">
+        Brief · Local intelligence layer
+      </footer>
+    </div>
+  );
+}
+
+export default App;
