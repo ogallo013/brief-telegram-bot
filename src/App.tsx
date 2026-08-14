@@ -543,46 +543,357 @@ export function App() {
           </div>
         </div>
 
-        {/* Cards Stream */}
-        {activeTab === 'stream' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {filteredObjects.map((obj) => (
-              <div key={obj.id} onClick={() => setSelectedObjectForDetail(obj)} className="bg-[#102117] border border-[#1E3A2A] hover:border-[#235F45] rounded-2xl overflow-hidden shadow-xl group cursor-pointer flex flex-col justify-between">
-                <div>
-                  {obj.imageUrl && (
-                    <div className="relative h-44 w-full bg-[#09150E]">
-                      <img src={obj.imageUrl} alt={obj.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90" />
-                      <div className="absolute top-3 left-3 flex items-center gap-2">
-                        <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-[#09150E]/80 text-[#00FF42] border border-[#235F45]">{obj.category}</span>
-                        {obj.metadata?.statusBadge && <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#00FF42] text-[#09150E]">{obj.metadata.statusBadge}</span>}
-                      </div>
-                      {obj.metadata?.price !== undefined && (
-                        <span className="absolute bottom-2 right-3 text-[#00FF42] font-mono text-sm font-extrabold bg-[#09150E]/80 px-2 py-0.5 rounded border border-[#235F45]">
-                          {obj.metadata.currency || 'KES'} {obj.metadata.price.toLocaleString()}
-                        </span>
-                      )}
-                    </div>
-                  )}
+        {/* Main Content */}
+{activeTab === 'stream' && (
+  <>
+    {/* Stream Filters */}
+    <div className="flex items-center gap-2 mb-5 overflow-x-auto no-scrollbar">
+      {[
+        { id: 'all', label: 'Everything' },
+        { id: 'place', label: 'Places' },
+        { id: 'experience', label: 'Events' },
+        { id: 'opportunity', label: 'Opportunities' },
+        { id: 'service', label: 'Services' },
+        { id: 'product', label: 'Market' },
+      ].map((filter) => (
+        <button
+          key={filter.id}
+          onClick={() => setSelectedObjectType(filter.id)}
+          className={`shrink-0 px-3 py-1.5 rounded-full text-[11px] font-extrabold border transition ${
+            selectedObjectType === filter.id
+              ? 'bg-[#00FF42] text-[#09150E] border-[#00FF42]'
+              : 'bg-[#102117] text-[#8DCF74] border-[#235F45] hover:border-[#00FF42]'
+          }`}
+        >
+          {filter.label}
+        </button>
+      ))}
+    </div>
 
-                  <div className="p-3.5 space-y-1.5">
-                    <h3 className="text-base font-extrabold text-[#E2ECE5] group-hover:text-[#00FF42] line-clamp-1">{obj.title}</h3>
-                    <p className="text-xs text-[#8DCF74] line-clamp-2">{obj.summary}</p>
+    {/* Objects */}
+    {filteredObjects.length > 0 ? (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {filteredObjects.map((obj) => (
+          <div
+            key={obj.id}
+            onClick={() => setSelectedObjectForDetail(obj)}
+            className="bg-[#102117] border border-[#1E3A2A] hover:border-[#235F45] rounded-2xl overflow-hidden shadow-xl group cursor-pointer flex flex-col justify-between transition"
+          >
+            <div>
+              {obj.imageUrl && (
+                <div className="relative h-44 w-full bg-[#09150E] overflow-hidden">
+                  <img
+                    src={obj.imageUrl}
+                    alt={obj.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
+                  />
+
+                  <div className="absolute top-3 left-3 flex items-center gap-2">
+                    <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-[#09150E]/80 text-[#00FF42] border border-[#235F45]">
+                      {obj.category}
+                    </span>
+
+                    {obj.isVerified && (
+                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#00FF42] text-[#09150E]">
+                        VERIFIED
+                      </span>
+                    )}
                   </div>
+
+                  {obj.metadata?.price !== undefined && (
+                    <span className="absolute bottom-2 right-3 text-[#00FF42] font-mono text-sm font-extrabold bg-[#09150E]/80 px-2 py-0.5 rounded border border-[#235F45]">
+                      {obj.metadata.currency || 'KES'} {obj.metadata.price.toLocaleString()}
+                    </span>
+                  )}
+                </div>
+              )}
+
+              <div className="p-4 space-y-2">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-[10px] font-mono uppercase text-[#86935C]">
+                    {getObjectTypeMeta(obj.type).label}
+                  </span>
+
+                  {obj.trustScore && (
+                    <span className="text-[10px] font-mono text-[#00FF42]">
+                      {obj.trustScore}% trusted
+                    </span>
+                  )}
                 </div>
 
-                <div className="p-3.5 pt-0 flex items-center gap-2 border-t border-[#1E3A2A] mt-2">
-                  <button onClick={(e) => { e.stopPropagation(); handleExecuteProtocolAction('book', obj); }} className="flex-1 bg-[#00FF42] hover:bg-[#8DCF74] text-[#09150E] font-extrabold text-xs py-2 rounded-xl transition flex items-center justify-center gap-1 cursor-pointer">
-                    <span>Act</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                  <button onClick={(e) => { e.stopPropagation(); handleExecuteProtocolAction('save', obj); }} className="p-2 rounded-xl bg-[#172D20] text-[#8DCF74] border border-[#1E3A2A] hover:bg-[#235F45] cursor-pointer">
-                    <Bookmark className="w-4 h-4 fill-current" />
-                  </button>
-                </div>
+                <h3 className="text-base font-extrabold text-[#E2ECE5] group-hover:text-[#00FF42] line-clamp-2">
+                  {obj.title}
+                </h3>
+
+                <p className="text-xs text-[#8DCF74] line-clamp-2">
+                  {obj.summary}
+                </p>
+
+                {obj.locationName && (
+                  <div className="flex items-center gap-1.5 text-[10px] text-[#86935C]">
+                    <MapPin className="w-3 h-3" />
+                    <span>{obj.locationName}</span>
+                  </div>
+                )}
               </div>
-            ))}
+            </div>
+
+            <div className="p-3.5 pt-0 flex items-center gap-2">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleExecuteProtocolAction('book', obj);
+                }}
+                className="flex-1 bg-[#00FF42] hover:bg-[#8DCF74] text-[#09150E] font-extrabold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-1 cursor-pointer"
+              >
+                <span>Act</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleExecuteProtocolAction('save', obj);
+                }}
+                className="p-2.5 rounded-xl bg-[#172D20] text-[#8DCF74] border border-[#1E3A2A] hover:bg-[#235F45] cursor-pointer"
+              >
+                <Bookmark className="w-4 h-4 fill-current" />
+              </button>
+            </div>
           </div>
-        )}
+        ))}
+      </div>
+    ) : (
+      <div className="py-16 text-center text-[#86935C]">
+        <Sparkles className="w-8 h-8 mx-auto mb-3 opacity-50" />
+        <p className="text-sm font-bold">Nothing here yet.</p>
+      </div>
+    )}
+  </>
+)}
+
+{/* MY LAYER */}
+{activeTab === 'companion' && (
+  <section className="space-y-5">
+    <div className="bg-[#102117] border border-[#235F45] rounded-2xl p-5">
+      <div className="flex items-center gap-2 mb-2">
+        <Bookmark className="w-4 h-4 text-[#00FF42]" />
+        <span className="text-[10px] font-mono uppercase text-[#00FF42]">
+          Your Layer
+        </span>
+      </div>
+
+      <h2 className="text-xl font-extrabold">
+        Things you've kept.
+      </h2>
+
+      <p className="text-xs text-[#8DCF74] mt-1">
+        Your saved places, opportunities and useful information.
+      </p>
+    </div>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {objects
+        .filter((obj) =>
+          relationships.some(
+            (rel) =>
+              rel.targetId === obj.id &&
+              rel.verb === 'saved'
+          )
+        )
+        .map((obj) => (
+          <div
+            key={obj.id}
+            onClick={() => setSelectedObjectForDetail(obj)}
+            className="bg-[#102117] border border-[#1E3A2A] hover:border-[#00FF42] rounded-2xl p-4 cursor-pointer transition"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <span className="text-[10px] font-mono uppercase text-[#86935C]">
+                  {obj.category}
+                </span>
+
+                <h3 className="font-extrabold mt-1">
+                  {obj.title}
+                </h3>
+
+                <p className="text-xs text-[#8DCF74] mt-1">
+                  {obj.summary}
+                </p>
+              </div>
+
+              <Bookmark className="w-4 h-4 text-[#00FF42] fill-current shrink-0" />
+            </div>
+          </div>
+        ))}
+    </div>
+
+    {relationships.filter((rel) => rel.verb === 'saved').length === 0 && (
+      <div className="py-16 text-center border border-dashed border-[#235F45] rounded-2xl">
+        <Bookmark className="w-8 h-8 mx-auto mb-3 text-[#86935C]" />
+        <p className="text-sm font-bold">Nothing saved yet.</p>
+        <p className="text-xs text-[#86935C] mt-1">
+          Save something from Nearby and it will appear here.
+        </p>
+      </div>
+    )}
+  </section>
+)}
+
+{/* WORKFLOWS */}
+{activeTab === 'journeys' && (
+  <section className="space-y-5">
+    <div className="bg-[#102117] border border-[#235F45] rounded-2xl p-5">
+      <div className="flex items-center gap-2 mb-2">
+        <Briefcase className="w-4 h-4 text-[#00FF42]" />
+        <span className="text-[10px] font-mono uppercase text-[#00FF42]">
+          Workflows
+        </span>
+      </div>
+
+      <h2 className="text-xl font-extrabold">
+        Things you can actually do.
+      </h2>
+
+      <p className="text-xs text-[#8DCF74] mt-1">
+        Follow a process instead of figuring it out from scratch.
+      </p>
+    </div>
+
+    {journeys.map((journey) => (
+      <div
+        key={journey.id}
+        className="bg-[#102117] border border-[#1E3A2A] rounded-2xl overflow-hidden"
+      >
+        <div className="p-5">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <span className="text-[10px] font-mono uppercase text-[#00FF42]">
+                {journey.category}
+              </span>
+
+              <h3 className="text-lg font-extrabold mt-1">
+                {journey.title}
+              </h3>
+
+              <p className="text-xs text-[#8DCF74] mt-1">
+                {journey.description}
+              </p>
+            </div>
+
+            <span className="text-xs font-mono font-bold text-[#00FF42]">
+              {journey.progressPercent}%
+            </span>
+          </div>
+
+          <div className="h-1.5 bg-[#09150E] rounded-full mt-5 overflow-hidden">
+            <div
+              className="h-full bg-[#00FF42] rounded-full"
+              style={{ width: `${journey.progressPercent}%` }}
+            />
+          </div>
+        </div>
+
+        <div className="border-t border-[#1E3A2A]">
+          {journey.steps.map((step) => (
+            <div
+              key={step.id}
+              className="flex items-center gap-3 p-4 border-b border-[#1E3A2A] last:border-b-0"
+            >
+              {step.isCompleted ? (
+                <CheckCircle2 className="w-5 h-5 text-[#00FF42] shrink-0" />
+              ) : (
+                <Circle className="w-5 h-5 text-[#86935C] shrink-0" />
+              )}
+
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-extrabold">
+                  {step.title}
+                </p>
+                <p className="text-[10px] text-[#86935C]">
+                  {step.description}
+                </p>
+              </div>
+
+              <span className="text-[9px] font-mono text-[#8DCF74]">
+                {step.statusLabel}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    ))}
+  </section>
+)}
+
+{/* INTELLIGENCE */}
+{activeTab === 'health' && (
+  <section className="space-y-5">
+    <div className="bg-[#102117] border border-[#235F45] rounded-2xl p-5">
+      <div className="flex items-center gap-2 mb-2">
+        <TrendingUp className="w-4 h-4 text-[#00FF42]" />
+        <span className="text-[10px] font-mono uppercase text-[#00FF42]">
+          Intelligence
+        </span>
+      </div>
+
+      <h2 className="text-xl font-extrabold">
+        What's changing around you.
+      </h2>
+
+      <p className="text-xs text-[#8DCF74] mt-1">
+        Brief quietly turns activity into useful signals.
+      </p>
+    </div>
+
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+      {[
+        ['Freshness', `${townHealth.infoFreshnessPct}%`, 'Information freshness'],
+        ['Businesses', townHealth.businessesHelped, 'Businesses helped'],
+        ['Events', townHealth.eventsAttended, 'Events attended'],
+        ['Opportunities', townHealth.opportunitiesActedOn, 'Acted on'],
+        ['Knowledge', townHealth.knowledgeResolved, 'Questions resolved'],
+        ['Community', townHealth.communityContributions, 'Contributions'],
+      ].map(([label, value, caption]) => (
+        <div
+          key={label}
+          className="bg-[#102117] border border-[#1E3A2A] rounded-2xl p-4"
+        >
+          <p className="text-[10px] uppercase font-mono text-[#86935C]">
+            {label}
+          </p>
+
+          <p className="text-2xl font-extrabold text-[#00FF42] mt-1">
+            {value}
+          </p>
+
+          <p className="text-[10px] text-[#8DCF74] mt-1">
+            {caption}
+          </p>
+        </div>
+      ))}
+    </div>
+
+    <div className="bg-[#102117] border border-[#1E3A2A] rounded-2xl p-5">
+      <div className="flex items-center gap-2">
+        <Award className="w-4 h-4 text-[#00FF42]" />
+        <span className="text-xs font-extrabold">
+          Brief signal
+        </span>
+      </div>
+
+      <p className="text-sm font-bold mt-3">
+        {townHealth.infoFreshnessPct}% of the local information layer
+        is currently marked fresh.
+      </p>
+
+      <p className="text-xs text-[#86935C] mt-1">
+        This is the kind of signal Brief should eventually surface
+        without making the user think about the machinery behind it.
+      </p>
+    </div>
+  </section>
+)}
 
       </main>
 
