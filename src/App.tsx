@@ -725,7 +725,7 @@ showToast(`${actionLabels[action]} "${object.title}".`);
                 }}
                 className="flex-1 bg-[#00FF42] hover:bg-[#8DCF74] text-[#09150E] font-extrabold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-1 cursor-pointer"
               >
-                <span>Act</span>
+                <span>{getObjectActionLabel(obj.type)}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
 
