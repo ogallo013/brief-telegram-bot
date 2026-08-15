@@ -631,7 +631,7 @@ showToast(`${actionLabels[action]} "${object.title}".`);
           <div
             key={obj.id}
             onClick={() => setSelectedObjectForDetail(obj)}
-            className="bg-[#102117] border border-[#1E3A2A] hover:border-[#235F45] rounded-2xl overflow-hidden shadow-xl group cursor-pointer flex flex-col justify-between transition"
+            className="bg-[#102117] border border-[#1E3A2A] hover:border-[#00FF42] hover:bg-[#13291C] rounded-2xl p-4 cursor-pointer transition"
           >
             <div>
               {obj.imageUrl && (
