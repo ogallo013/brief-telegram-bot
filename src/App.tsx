@@ -558,7 +558,48 @@ showToast(`${actionLabels[action]} "${object.title}".`);
 
         {/* Main Content */}
 {activeTab === 'stream' && (
-  <>
+  <>    {/* TEA */}
+    <div className="mb-5">
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <div className="text-[11px] font-extrabold uppercase tracking-wider text-[#00FF42]">
+            Today's Tea
+          </div>
+          <div className="text-sm font-bold text-[#E2ECE5]">
+            What Nairobi is talking about
+          </div>
+        </div>
+
+        <button
+          onClick={() => showToast('Tea is brewing...')}
+          className="text-[11px] font-extrabold text-[#8DCF74] border border-[#235F45] px-3 py-1.5 rounded-full"
+        >
+          See all
+        </button>
+      </div>
+
+      <div className="flex gap-3 overflow-x-auto no-scrollbar">
+        {[
+          { label: 'Morning Tea', icon: '☀️' },
+          { label: 'Evening Tea', icon: '🌆' },
+          { label: 'Weekend Tea', icon: '🗓️' },
+        ].map((tea) => (
+          <button
+            key={tea.label}
+            onClick={() => showToast(`${tea.label} selected`)}
+            className="shrink-0 bg-[#102117] border border-[#235F45] hover:border-[#00FF42] rounded-2xl px-4 py-3 text-left min-w-[145px] transition"
+          >
+            <div className="text-lg mb-1">{tea.icon}</div>
+            <div className="text-xs font-extrabold text-[#E2ECE5]">
+              {tea.label}
+            </div>
+            <div className="text-[10px] text-[#8DCF74] mt-1">
+              The stories people are discussing
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
     {/* Stream Filters */}
     <div className="flex items-center gap-2 mb-5 overflow-x-auto no-scrollbar">
       {[
