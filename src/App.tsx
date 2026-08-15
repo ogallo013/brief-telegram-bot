@@ -27,7 +27,32 @@ import {
   Landmark,
   X
 } from 'lucide-react';
-
+const getObjectActionLabel = (type: ObjectType): string => {
+  switch (type) {
+    case 'place':
+      return 'Visit';
+    case 'experience':
+      return 'Join';
+    case 'opportunity':
+      return 'Apply';
+    case 'service':
+      return 'Book';
+    case 'product':
+      return 'Buy';
+    case 'knowledge':
+      return 'Read';
+    case 'identity':
+      return 'View';
+    case 'community':
+      return 'Join';
+    case 'conversation':
+      return 'Discuss';
+    case 'document':
+      return 'Open';
+    default:
+      return 'View';
+  }
+};
 // ============================================================================
 // 1. TYPES & ENUMS
 // ============================================================================
