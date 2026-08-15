@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import { 
-  Building2, 
-  Search, 
-  Sparkles, 
-  Plus, 
-  Terminal, 
-  MapPin, 
+import {
+  Building2,
+  Search,
+  Sparkles,
+  Plus,
+  Terminal,
+  MapPin,
   Users,
   Briefcase,
   ArrowRight,
@@ -27,35 +27,11 @@ import {
   Landmark,
   X
 } from 'lucide-react';
-const getObjectActionLabel = (type: ObjectType): string => {
-  switch (type) {
-    case 'place':
-      return 'Visit';
-    case 'experience':
-      return 'Join';
-    case 'opportunity':
-      return 'Apply';
-    case 'service':
-      return 'Book';
-    case 'product':
-      return 'Buy';
-    case 'knowledge':
-      return 'Read';
-    case 'identity':
-      return 'View';
-    case 'community':
-      return 'Join';
-    case 'conversation':
-      return 'Discuss';
-    case 'document':
-      return 'Open';
-    default:
-      return 'View';
-  }
-};
+
 // ============================================================================
 // 1. TYPES & ENUMS
 // ============================================================================
+
 export type ObjectType =
   | 'place'
   | 'identity'
@@ -157,6 +133,37 @@ export interface TownHealthMetrics {
   infoFreshnessPct: number;
 }
 
+// ----------------------------------------------------------------------------
+// Type-derived helpers (must live BELOW the type declarations above)
+// ----------------------------------------------------------------------------
+
+const getObjectActionLabel = (type: ObjectType): string => {
+  switch (type) {
+    case 'place':
+      return 'Visit';
+    case 'experience':
+      return 'Join';
+    case 'opportunity':
+      return 'Apply';
+    case 'service':
+      return 'Book';
+    case 'product':
+      return 'Buy';
+    case 'knowledge':
+      return 'Read';
+    case 'identity':
+      return 'View';
+    case 'community':
+      return 'Join';
+    case 'conversation':
+      return 'Discuss';
+    case 'document':
+      return 'Open';
+    default:
+      return 'View';
+  }
+};
+
 // ============================================================================
 // 2. SEED DATA
 // ============================================================================
@@ -175,7 +182,7 @@ const INITIAL_OBJECTS: BriefObject[] = [
     isVerified: true,
     imageUrl: 'https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=1000&q=80',
     metadata: {
-      operatingHours: '06:00–18:30',
+      operatingHours: '06:00â€“18:30',
       statusBadge: 'Open Now',
       capacity: 1500,
       rating: 4.8,
@@ -198,7 +205,7 @@ const INITIAL_OBJECTS: BriefObject[] = [
     isVerified: true,
     imageUrl: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?auto=format&fit=crop&w=1000&q=80',
     metadata: {
-      operatingHours: '06:00–20:00',
+      operatingHours: '06:00â€“20:00',
       statusBadge: 'Open Access',
       capacity: 800,
       rating: 4.6,
@@ -244,7 +251,7 @@ const INITIAL_OBJECTS: BriefObject[] = [
     isVerified: true,
     imageUrl: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=80',
     metadata: {
-      operatingHours: '08:00–17:00',
+      operatingHours: '08:00â€“17:00',
       statusBadge: 'Verified Authority',
       contactPhone: '+254 700 000 111',
       rating: 4.3,
@@ -267,7 +274,7 @@ const INITIAL_OBJECTS: BriefObject[] = [
     isVerified: true,
     imageUrl: 'https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=1000&q=80',
     metadata: {
-      operatingHours: '07:00–18:00',
+      operatingHours: '07:00â€“18:00',
       statusBadge: 'Active Seller',
       contactPhone: '+254 712 345 678',
       rating: 4.9,
@@ -290,7 +297,7 @@ const INITIAL_OBJECTS: BriefObject[] = [
     isVerified: true,
     imageUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1000&q=80',
     metadata: {
-      operatingHours: 'Aug 15 • 09:00',
+      operatingHours: 'Aug 15 â€¢ 09:00',
       statusBadge: 'Upcoming',
       capacity: 300,
       rating: 4.8,
@@ -487,25 +494,62 @@ export function App() {
     });
 
     const actionLabels: Record<ProtocolAction, string> = {
-  discover: 'Opened',
-  read: 'Opened',
-  save: 'Saved',
-  share: 'Shared',
-  contact: 'Contact started',
-  book: 'Booking started',
-  buy: 'Purchase started',
-  report: 'Reported',
-  verify: 'Verification started',
-  follow: 'Following',
-};
+      discover: 'Opened',
+      read: 'Opened',
+      save: 'Saved',
+      share: 'Shared',
+      contact: 'Contact started',
+      book: 'Booking',
+      buy: 'Purchase',
+      report: 'Reported',
+      verify: 'Verification started',
+      follow: 'Following',
+    };
 
-showToast(`${actionLabels[action]} "${object.title}".`);
+    showToast(`${actionLabels[action]} "${object.title}".`);
+  };
+
+  const getRelatedObjects = (object: BriefObject) => {
+    return objects
+      .filter((item) => item.id !== object.id)
+      .map((item) => {
+        let score = 0;
+
+        // Same category gets highest relevance
+        if (item.category === object.category) {
+          score += 3;
+        }
+
+        // Same type
+        if (item.type === object.type) {
+          score += 1;
+        }
+
+        // Nearby location
+        if (item.locationName && object.locationName) {
+          const itemLocation = item.locationName.toLowerCase();
+          const objectLocation = object.locationName.toLowerCase();
+
+          if (
+            itemLocation.includes(objectLocation.split(',')[0]) ||
+            objectLocation.includes(itemLocation.split(',')[0])
+          ) {
+            score += 2;
+          }
+        }
+
+        return { item, score };
+      })
+      .filter(({ score }) => score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 4)
+      .map(({ item }) => item);
   };
 
   const filteredObjects = useMemo(() => {
     return objects.filter(obj => {
       const matchesType = selectedObjectType === 'all' || obj.type === selectedObjectType;
-      const matchesSearch = searchQuery === '' || 
+      const matchesSearch = searchQuery === '' ||
         obj.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         obj.summary.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesType && matchesSearch;
@@ -514,7 +558,7 @@ showToast(`${actionLabels[action]} "${object.title}".`);
 
   return (
     <div className="min-h-screen bg-[#09150E] text-[#E2ECE5] flex flex-col font-sans selection:bg-[#00FF42] selection:text-[#09150E]">
-      
+
       {/* Toast */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 bg-[#00FF42] text-[#09150E] px-4 py-2.5 rounded-xl font-extrabold shadow-2xl flex items-center gap-2">
@@ -565,15 +609,15 @@ showToast(`${actionLabels[action]} "${object.title}".`);
 
       {/* Main Stream */}
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6">
-        
+
         {/* Visual Hero Bar */}
         <div className="mb-6 rounded-2xl bg-[#102117] border border-[#235F45] p-5 shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="w-2.5 h-2.5 rounded-full bg-[#00FF42] animate-ping" />
-              <span className="text-xs font-mono font-extrabold uppercase text-[#00FF42]">{selectedLocation} • Live Local Stream</span>
+              <span className="text-xs font-mono font-extrabold uppercase text-[#00FF42]">{selectedLocation} â€¢ Live Local Stream</span>
             </div>
-            <h1 className="text-xl font-extrabold text-[#E2ECE5]">Brief — Everything Happening Around You</h1>
+            <h1 className="text-xl font-extrabold text-[#E2ECE5]">Brief â€” Everything Happening Around You</h1>
           </div>
           <div className="flex items-center gap-2 font-mono text-xs font-extrabold">
             <span className="bg-[#09150E] px-3 py-1.5 rounded-xl border border-[#235F45] text-[#00FF42]">{objects.length} Objects</span>
@@ -582,408 +626,413 @@ showToast(`${actionLabels[action]} "${object.title}".`);
         </div>
 
         {/* Main Content */}
-{activeTab === 'stream' && (
-  <>    {/* TEA */}
-    <div className="mb-5">
-      <div className="flex items-center justify-between mb-3">
-        <div>
-          <div className="text-[11px] font-extrabold uppercase tracking-wider text-[#00FF42]">
-            Today's Tea
-          </div>
-          <div className="text-sm font-bold text-[#E2ECE5]">
-            What Nairobi is talking about
-          </div>
-        </div>
-
-        <button
-          onClick={() => showToast('Tea is brewing...')}
-          className="text-[11px] font-extrabold text-[#8DCF74] border border-[#235F45] px-3 py-1.5 rounded-full"
-        >
-          See all
-        </button>
-      </div>
-
-      <div className="flex gap-3 overflow-x-auto no-scrollbar">
-        {[
-          { label: 'Morning Tea', icon: '☀️' },
-          { label: 'Evening Tea', icon: '🌆' },
-          { label: 'Weekend Tea', icon: '🗓️' },
-        ].map((tea) => (
-          <button
-            key={tea.label}
-            onClick={() => showToast(`${tea.label} selected`)}
-            className="shrink-0 bg-[#102117] border border-[#235F45] hover:border-[#00FF42] rounded-2xl px-4 py-3 text-left min-w-[145px] transition"
-          >
-            <div className="text-lg mb-1">{tea.icon}</div>
-            <div className="text-xs font-extrabold text-[#E2ECE5]">
-              {tea.label}
-            </div>
-            <div className="text-[10px] text-[#8DCF74] mt-1">
-              The stories people are discussing
-            </div>
-          </button>
-        ))}
-      </div>
-    </div>
-    {/* Stream Filters */}
-    <div className="flex items-center gap-2 mb-5 overflow-x-auto no-scrollbar">
-      {[
-        { id: 'all', label: 'Everything' },
-        { id: 'place', label: 'Places' },
-        { id: 'experience', label: 'Events' },
-        { id: 'opportunity', label: 'Opportunities' },
-        { id: 'service', label: 'Services' },
-        { id: 'product', label: 'Market' },
-      ].map((filter) => (
-        <button
-          key={filter.id}
-          onClick={() => setSelectedObjectType(filter.id)}
-          className={`shrink-0 px-3 py-1.5 rounded-full text-[11px] font-extrabold border transition ${
-            selectedObjectType === filter.id
-              ? 'bg-[#00FF42] text-[#09150E] border-[#00FF42]'
-              : 'bg-[#102117] text-[#8DCF74] border-[#235F45] hover:border-[#00FF42]'
-          }`}
-        >
-          {filter.label}
-        </button>
-      ))}
-    </div>
-
-    {/* Objects */}
-    {filteredObjects.length > 0 ? (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {filteredObjects.map((obj) => (
-          <div
-            key={obj.id}
-            onClick={() => setSelectedObjectForDetail(obj)}
-            className="bg-[#102117] border border-[#1E3A2A] hover:border-[#00FF42] hover:bg-[#13291C] rounded-2xl p-4 cursor-pointer transition"
-          >
-            <div>
-              {obj.imageUrl && (
-                <div className="relative h-44 w-full bg-[#09150E] overflow-hidden">
-                  <img
-                    src={obj.imageUrl}
-                    alt={obj.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
-                  />
-
-                  <div className="absolute top-3 left-3 flex items-center gap-2">
-                    <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-[#09150E]/80 text-[#00FF42] border border-[#235F45]">
-                      {obj.category}
-                    </span>
-
-                    {obj.isVerified && (
-                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#00FF42] text-[#09150E]">
-                        VERIFIED
-                      </span>
-                    )}
+        {activeTab === 'stream' && (
+          <>
+            {/* TEA */}
+            <div className="mb-5">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <div className="text-[11px] font-extrabold uppercase tracking-wider text-[#00FF42]">
+                    Today's Tea
                   </div>
-
-                  {obj.metadata?.price !== undefined && (
-                    <span className="absolute bottom-2 right-3 text-[#00FF42] font-mono text-sm font-extrabold bg-[#09150E]/80 px-2 py-0.5 rounded border border-[#235F45]">
-                      {obj.metadata.currency || 'KES'} {obj.metadata.price.toLocaleString()}
-                    </span>
-                  )}
-                </div>
-              )}
-
-              <div className="p-4 space-y-2">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-[10px] font-mono uppercase text-[#86935C]">
-                    {getObjectTypeMeta(obj.type).label}
-                  </span>
-
-                  {obj.trustScore && (
-                    <span className="text-[10px] font-mono text-[#00FF42]">
-                      {obj.trustScore}% trusted
-                    </span>
-                  )}
+                  <div className="text-sm font-bold text-[#E2ECE5]">
+                    What Nairobi is talking about
+                  </div>
                 </div>
 
-                <h3 className="text-base font-extrabold text-[#E2ECE5] group-hover:text-[#00FF42] line-clamp-2">
-                  {obj.title}
-                </h3>
+                <button
+                  onClick={() => showToast('Tea is brewing...')}
+                  className="text-[11px] font-extrabold text-[#8DCF74] border border-[#235F45] px-3 py-1.5 rounded-full"
+                >
+                  See all
+                </button>
+              </div>
 
-                <p className="text-xs text-[#8DCF74] line-clamp-2">
-                  {obj.summary}
-                </p>
-
-                {obj.locationName && (
-                  <div className="flex items-center gap-1.5 text-[10px] text-[#86935C]">
-                    <MapPin className="w-3 h-3" />
-                    <span>{obj.locationName}</span>
-                  </div>
-                )}
+              <div className="flex gap-3 overflow-x-auto no-scrollbar">
+                {[
+                  { label: 'Morning Tea', icon: 'â˜€ï¸' },
+                  { label: 'Evening Tea', icon: 'ðŸŒ†' },
+                  { label: 'Weekend Tea', icon: 'ðŸ—“ï¸' },
+                ].map((tea) => (
+                  <button
+                    key={tea.label}
+                    onClick={() => showToast(`${tea.label} selected`)}
+                    className="shrink-0 bg-[#102117] border border-[#235F45] hover:border-[#00FF42] rounded-2xl px-4 py-3 text-left min-w-[145px] transition"
+                  >
+                    <div className="text-lg mb-1">{tea.icon}</div>
+                    <div className="text-xs font-extrabold text-[#E2ECE5]">
+                      {tea.label}
+                    </div>
+                    <div className="text-[10px] text-[#8DCF74] mt-1">
+                      The stories people are discussing
+                    </div>
+                  </button>
+                ))}
               </div>
             </div>
 
-            <div className="p-3.5 pt-0 flex items-center gap-2">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleExecuteProtocolAction('book', obj);
-                }}
-                className="flex-1 bg-[#00FF42] hover:bg-[#8DCF74] text-[#09150E] font-extrabold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-1 cursor-pointer"
-              >
-                <span>{getObjectActionLabel(obj.type)}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleExecuteProtocolAction('save', obj);
-                }}
-                className="p-2.5 rounded-xl bg-[#172D20] text-[#8DCF74] border border-[#1E3A2A] hover:bg-[#235F45] cursor-pointer"
-              >
-                <Bookmark className="w-4 h-4 fill-current" />
-              </button>
+            {/* Stream Filters */}
+            <div className="flex items-center gap-2 mb-5 overflow-x-auto no-scrollbar">
+              {[
+                { id: 'all', label: 'Everything' },
+                { id: 'place', label: 'Places' },
+                { id: 'experience', label: 'Events' },
+                { id: 'opportunity', label: 'Opportunities' },
+                { id: 'service', label: 'Services' },
+                { id: 'product', label: 'Market' },
+              ].map((filter) => (
+                <button
+                  key={filter.id}
+                  onClick={() => setSelectedObjectType(filter.id)}
+                  className={`shrink-0 px-3 py-1.5 rounded-full text-[11px] font-extrabold border transition ${
+                    selectedObjectType === filter.id
+                      ? 'bg-[#00FF42] text-[#09150E] border-[#00FF42]'
+                      : 'bg-[#102117] text-[#8DCF74] border-[#235F45] hover:border-[#00FF42]'
+                  }`}
+                >
+                  {filter.label}
+                </button>
+              ))}
             </div>
-          </div>
-        ))}
-      </div>
-    ) : (
-      <div className="py-16 text-center text-[#86935C]">
-        <Sparkles className="w-8 h-8 mx-auto mb-3 opacity-50" />
-        <p className="text-sm font-bold">Nothing here yet.</p>
-      </div>
-    )}
-  </>
-)}
 
-{/* MY LAYER */}
-{activeTab === 'companion' && (
-  <section className="space-y-5">
-    <div className="bg-[#102117] border border-[#235F45] rounded-2xl p-5">
-      <div className="flex items-center gap-2 mb-2">
-        <Bookmark className="w-4 h-4 text-[#00FF42]" />
-        <span className="text-[10px] font-mono uppercase text-[#00FF42]">
-          Your Layer
-        </span>
-      </div>
+            {/* Objects */}
+            {filteredObjects.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {filteredObjects.map((obj) => (
+                  <div
+                    key={obj.id}
+                    onClick={() => setSelectedObjectForDetail(obj)}
+                    className="bg-[#102117] border border-[#1E3A2A] hover:border-[#00FF42] hover:bg-[#13291C] rounded-2xl p-4 cursor-pointer transition"
+                  >
+                    <div>
+                      {obj.imageUrl && (
+                        <div className="relative h-44 w-full bg-[#09150E] overflow-hidden">
+                          <img
+                            src={obj.imageUrl}
+                            alt={obj.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
+                          />
 
-      <h2 className="text-xl font-extrabold">
-        Things you've kept.
-      </h2>
+                          <div className="absolute top-3 left-3 flex items-center gap-2">
+                            <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-[#09150E]/80 text-[#00FF42] border border-[#235F45]">
+                              {obj.category}
+                            </span>
 
-      <p className="text-xs text-[#8DCF74] mt-1">
-        Your saved places, opportunities and useful information.
-      </p>
-    </div>
+                            {obj.isVerified && (
+                              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#00FF42] text-[#09150E]">
+                                VERIFIED
+                              </span>
+                            )}
+                          </div>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {objects
-        .filter((obj) =>
-          relationships.some(
-            (rel) =>
-              rel.targetId === obj.id &&
-              rel.verb === 'saved'
-          )
-        )
-        .map((obj) => (
-          <div
-            key={obj.id}
-            onClick={() => setSelectedObjectForDetail(obj)}
-            className="bg-[#102117] border border-[#1E3A2A] hover:border-[#00FF42] rounded-2xl p-4 cursor-pointer transition"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <span className="text-[10px] font-mono uppercase text-[#86935C]">
-                  {obj.category}
+                          {obj.metadata?.price !== undefined && (
+                            <span className="absolute bottom-2 right-3 text-[#00FF42] font-mono text-sm font-extrabold bg-[#09150E]/80 px-2 py-0.5 rounded border border-[#235F45]">
+                              {obj.metadata.currency || 'KES'} {obj.metadata.price.toLocaleString()}
+                            </span>
+                          )}
+                        </div>
+                      )}
+
+                      <div className="p-4 space-y-2">
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-[10px] font-mono uppercase text-[#86935C]">
+                            {getObjectTypeMeta(obj.type).label}
+                          </span>
+
+                          {obj.trustScore && (
+                            <span className="text-[10px] font-mono text-[#00FF42]">
+                              {obj.trustScore}% trusted
+                            </span>
+                          )}
+                        </div>
+
+                        <h3 className="text-base font-extrabold text-[#E2ECE5] group-hover:text-[#00FF42] line-clamp-2">
+                          {obj.title}
+                        </h3>
+
+                        <p className="text-xs text-[#8DCF74] line-clamp-2">
+                          {obj.summary}
+                        </p>
+
+                        {obj.locationName && (
+                          <div className="flex items-center gap-1.5 text-[10px] text-[#86935C]">
+                            <MapPin className="w-3 h-3" />
+                            <span>{obj.locationName}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="p-3.5 pt-0 flex items-center gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleExecuteProtocolAction('book', obj);
+                        }}
+                        className="flex-1 bg-[#00FF42] hover:bg-[#8DCF74] text-[#09150E] font-extrabold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-1 cursor-pointer"
+                      >
+                        <span>{getObjectActionLabel(obj.type)}</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleExecuteProtocolAction('save', obj);
+                        }}
+                        className="p-2.5 rounded-xl bg-[#172D20] text-[#8DCF74] border border-[#1E3A2A] hover:bg-[#235F45] cursor-pointer"
+                      >
+                        <Bookmark className="w-4 h-4 fill-current" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="py-16 text-center text-[#86935C]">
+                <Sparkles className="w-8 h-8 mx-auto mb-3 opacity-50" />
+                <p className="text-sm font-bold">Nothing here yet.</p>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* MY LAYER */}
+        {activeTab === 'companion' && (
+          <section className="space-y-5">
+            <div className="bg-[#102117] border border-[#235F45] rounded-2xl p-5">
+              <div className="flex items-center gap-2 mb-2">
+                <Bookmark className="w-4 h-4 text-[#00FF42]" />
+                <span className="text-[10px] font-mono uppercase text-[#00FF42]">
+                  Your Layer
                 </span>
-
-                <h3 className="font-extrabold mt-1">
-                  {obj.title}
-                </h3>
-
-                <p className="text-xs text-[#8DCF74] mt-1">
-                  {obj.summary}
-                </p>
               </div>
 
-              <Bookmark className="w-4 h-4 text-[#00FF42] fill-current shrink-0" />
-            </div>
-          </div>
-        ))}
-    </div>
-
-    {relationships.filter((rel) => rel.verb === 'saved').length === 0 && (
-      <div className="py-16 text-center border border-dashed border-[#235F45] rounded-2xl">
-        <Bookmark className="w-8 h-8 mx-auto mb-3 text-[#86935C]" />
-        <p className="text-sm font-bold">Nothing saved yet.</p>
-        <p className="text-xs text-[#86935C] mt-1">
-          Save something from Nearby and it will appear here.
-        </p>
-      </div>
-    )}
-  </section>
-)}
-
-{/* WORKFLOWS */}
-{activeTab === 'journeys' && (
-  <section className="space-y-5">
-    <div className="bg-[#102117] border border-[#235F45] rounded-2xl p-5">
-      <div className="flex items-center gap-2 mb-2">
-        <Briefcase className="w-4 h-4 text-[#00FF42]" />
-        <span className="text-[10px] font-mono uppercase text-[#00FF42]">
-          Workflows
-        </span>
-      </div>
-
-      <h2 className="text-xl font-extrabold">
-        Things you can actually do.
-      </h2>
-
-      <p className="text-xs text-[#8DCF74] mt-1">
-        Follow a process instead of figuring it out from scratch.
-      </p>
-    </div>
-
-    {journeys.map((journey) => (
-      <div
-        key={journey.id}
-        className="bg-[#102117] border border-[#1E3A2A] rounded-2xl overflow-hidden"
-      >
-        <div className="p-5">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <span className="text-[10px] font-mono uppercase text-[#00FF42]">
-                {journey.category}
-              </span>
-
-              <h3 className="text-lg font-extrabold mt-1">
-                {journey.title}
-              </h3>
+              <h2 className="text-xl font-extrabold">
+                Things you've kept.
+              </h2>
 
               <p className="text-xs text-[#8DCF74] mt-1">
-                {journey.description}
+                Your saved places, opportunities and useful information.
               </p>
             </div>
 
-            <span className="text-xs font-mono font-bold text-[#00FF42]">
-              {journey.progressPercent}%
-            </span>
-          </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {objects
+                .filter((obj) =>
+                  relationships.some(
+                    (rel) =>
+                      rel.targetId === obj.id &&
+                      rel.verb === 'saved'
+                  )
+                )
+                .map((obj) => (
+                  <div
+                    key={obj.id}
+                    onClick={() => setSelectedObjectForDetail(obj)}
+                    className="bg-[#102117] border border-[#1E3A2A] hover:border-[#00FF42] rounded-2xl p-4 cursor-pointer transition"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <span className="text-[10px] font-mono uppercase text-[#86935C]">
+                          {obj.category}
+                        </span>
 
-          <div className="h-1.5 bg-[#09150E] rounded-full mt-5 overflow-hidden">
-            <div
-              className="h-full bg-[#00FF42] rounded-full"
-              style={{ width: `${journey.progressPercent}%` }}
-            />
-          </div>
-        </div>
+                        <h3 className="font-extrabold mt-1">
+                          {obj.title}
+                        </h3>
 
-        <div className="border-t border-[#1E3A2A]">
-          {journey.steps.map((step) => (
-            <div
-              key={step.id}
-              className="flex items-center gap-3 p-4 border-b border-[#1E3A2A] last:border-b-0"
-            >
-              {step.isCompleted ? (
-                <CheckCircle2 className="w-5 h-5 text-[#00FF42] shrink-0" />
-              ) : (
-                <Circle className="w-5 h-5 text-[#86935C] shrink-0" />
-              )}
+                        <p className="text-xs text-[#8DCF74] mt-1">
+                          {obj.summary}
+                        </p>
+                      </div>
 
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-extrabold">
-                  {step.title}
-                </p>
-                <p className="text-[10px] text-[#86935C]">
-                  {step.description}
+                      <Bookmark className="w-4 h-4 text-[#00FF42] fill-current shrink-0" />
+                    </div>
+                  </div>
+                ))}
+            </div>
+
+            {relationships.filter((rel) => rel.verb === 'saved').length === 0 && (
+              <div className="py-16 text-center border border-dashed border-[#235F45] rounded-2xl">
+                <Bookmark className="w-8 h-8 mx-auto mb-3 text-[#86935C]" />
+                <p className="text-sm font-bold">Nothing saved yet.</p>
+                <p className="text-xs text-[#86935C] mt-1">
+                  Save something from Nearby and it will appear here.
                 </p>
               </div>
+            )}
+          </section>
+        )}
 
-              <span className="text-[9px] font-mono text-[#8DCF74]">
-                {step.statusLabel}
-              </span>
+        {/* WORKFLOWS */}
+        {activeTab === 'journeys' && (
+          <section className="space-y-5">
+            <div className="bg-[#102117] border border-[#235F45] rounded-2xl p-5">
+              <div className="flex items-center gap-2 mb-2">
+                <Briefcase className="w-4 h-4 text-[#00FF42]" />
+                <span className="text-[10px] font-mono uppercase text-[#00FF42]">
+                  Workflows
+                </span>
+              </div>
+
+              <h2 className="text-xl font-extrabold">
+                Things you can actually do.
+              </h2>
+
+              <p className="text-xs text-[#8DCF74] mt-1">
+                Follow a process instead of figuring it out from scratch.
+              </p>
             </div>
-          ))}
-        </div>
-      </div>
-    ))}
-  </section>
-)}
 
-{/* INTELLIGENCE */}
-{activeTab === 'health' && (
-  <section className="space-y-5">
-    <div className="bg-[#102117] border border-[#235F45] rounded-2xl p-5">
-      <div className="flex items-center gap-2 mb-2">
-        <TrendingUp className="w-4 h-4 text-[#00FF42]" />
-        <span className="text-[10px] font-mono uppercase text-[#00FF42]">
-          Intelligence
-        </span>
-      </div>
+            {journeys.map((journey) => (
+              <div
+                key={journey.id}
+                className="bg-[#102117] border border-[#1E3A2A] rounded-2xl overflow-hidden"
+              >
+                <div className="p-5">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <span className="text-[10px] font-mono uppercase text-[#00FF42]">
+                        {journey.category}
+                      </span>
 
-      <h2 className="text-xl font-extrabold">
-        What's changing around you.
-      </h2>
+                      <h3 className="text-lg font-extrabold mt-1">
+                        {journey.title}
+                      </h3>
 
-      <p className="text-xs text-[#8DCF74] mt-1">
-        Brief quietly turns activity into useful signals.
-      </p>
-    </div>
+                      <p className="text-xs text-[#8DCF74] mt-1">
+                        {journey.description}
+                      </p>
+                    </div>
 
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-      {[
-        ['Freshness', `${townHealth.infoFreshnessPct}%`, 'Information freshness'],
-        ['Businesses', townHealth.businessesHelped, 'Businesses helped'],
-        ['Events', townHealth.eventsAttended, 'Events attended'],
-        ['Opportunities', townHealth.opportunitiesActedOn, 'Acted on'],
-        ['Knowledge', townHealth.knowledgeResolved, 'Questions resolved'],
-        ['Community', townHealth.communityContributions, 'Contributions'],
-      ].map(([label, value, caption]) => (
-        <div
-          key={label}
-          className="bg-[#102117] border border-[#1E3A2A] rounded-2xl p-4"
-        >
-          <p className="text-[10px] uppercase font-mono text-[#86935C]">
-            {label}
-          </p>
+                    <span className="text-xs font-mono font-bold text-[#00FF42]">
+                      {journey.progressPercent}%
+                    </span>
+                  </div>
 
-          <p className="text-2xl font-extrabold text-[#00FF42] mt-1">
-            {value}
-          </p>
+                  <div className="h-1.5 bg-[#09150E] rounded-full mt-5 overflow-hidden">
+                    <div
+                      className="h-full bg-[#00FF42] rounded-full"
+                      style={{ width: `${journey.progressPercent}%` }}
+                    />
+                  </div>
+                </div>
 
-          <p className="text-[10px] text-[#8DCF74] mt-1">
-            {caption}
-          </p>
-        </div>
-      ))}
-    </div>
+                <div className="border-t border-[#1E3A2A]">
+                  {journey.steps.map((step) => (
+                    <div
+                      key={step.id}
+                      className="flex items-center gap-3 p-4 border-b border-[#1E3A2A] last:border-b-0"
+                    >
+                      {step.isCompleted ? (
+                        <CheckCircle2 className="w-5 h-5 text-[#00FF42] shrink-0" />
+                      ) : (
+                        <Circle className="w-5 h-5 text-[#86935C] shrink-0" />
+                      )}
 
-    <div className="bg-[#102117] border border-[#1E3A2A] rounded-2xl p-5">
-      <div className="flex items-center gap-2">
-        <Award className="w-4 h-4 text-[#00FF42]" />
-        <span className="text-xs font-extrabold">
-          Brief signal
-        </span>
-      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-extrabold">
+                          {step.title}
+                        </p>
+                        <p className="text-[10px] text-[#86935C]">
+                          {step.description}
+                        </p>
+                      </div>
 
-      <p className="text-sm font-bold mt-3">
-        {townHealth.infoFreshnessPct}% of the local information layer
-        is currently marked fresh.
-      </p>
+                      <span className="text-[9px] font-mono text-[#8DCF74]">
+                        {step.statusLabel}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </section>
+        )}
 
-      <p className="text-xs text-[#86935C] mt-1">
-        This is the kind of signal Brief should eventually surface
-        without making the user think about the machinery behind it.
-      </p>
-    </div>
-  </section>
-)}
+        {/* INTELLIGENCE */}
+        {activeTab === 'health' && (
+          <section className="space-y-5">
+            <div className="bg-[#102117] border border-[#235F45] rounded-2xl p-5">
+              <div className="flex items-center gap-2 mb-2">
+                <TrendingUp className="w-4 h-4 text-[#00FF42]" />
+                <span className="text-[10px] font-mono uppercase text-[#00FF42]">
+                  Intelligence
+                </span>
+              </div>
+
+              <h2 className="text-xl font-extrabold">
+                What's changing around you.
+              </h2>
+
+              <p className="text-xs text-[#8DCF74] mt-1">
+                Brief quietly turns activity into useful signals.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {[
+                ['Freshness', `${townHealth.infoFreshnessPct}%`, 'Information freshness'],
+                ['Businesses', townHealth.businessesHelped, 'Businesses helped'],
+                ['Events', townHealth.eventsAttended, 'Events attended'],
+                ['Opportunities', townHealth.opportunitiesActedOn, 'Acted on'],
+                ['Knowledge', townHealth.knowledgeResolved, 'Questions resolved'],
+                ['Community', townHealth.communityContributions, 'Contributions'],
+              ].map(([label, value, caption]) => (
+                <div
+                  key={label}
+                  className="bg-[#102117] border border-[#1E3A2A] rounded-2xl p-4"
+                >
+                  <p className="text-[10px] uppercase font-mono text-[#86935C]">
+                    {label}
+                  </p>
+
+                  <p className="text-2xl font-extrabold text-[#00FF42] mt-1">
+                    {value}
+                  </p>
+
+                  <p className="text-[10px] text-[#8DCF74] mt-1">
+                    {caption}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <div className="bg-[#102117] border border-[#1E3A2A] rounded-2xl p-5">
+              <div className="flex items-center gap-2">
+                <Award className="w-4 h-4 text-[#00FF42]" />
+                <span className="text-xs font-extrabold">
+                  Brief signal
+                </span>
+              </div>
+
+              <p className="text-sm font-bold mt-3">
+                {townHealth.infoFreshnessPct}% of the local information layer
+                is currently marked fresh.
+              </p>
+
+              <p className="text-xs text-[#86935C] mt-1">
+                This is the kind of signal Brief should eventually surface
+                without making the user think about the machinery behind it.
+              </p>
+            </div>
+          </section>
+        )}
+
+      </main>
+
       {/* DETAIL LAYER */}
       {selectedObjectForDetail && (
         <div
           className="fixed inset-0 z-50 bg-[#09150E]/90 backdrop-blur-md overflow-y-auto"
           onClick={() => setSelectedObjectForDetail(null)}
         >
-          <div
-            className="min-h-screen flex items-end sm:items-center justify-center p-0 sm:p-6"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="w-full max-w-2xl bg-[#102117] border border-[#235F45] rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl">
+          <div className="min-h-screen flex items-end sm:items-center justify-center p-0 sm:p-6">
+            <div
+              className="w-full max-w-2xl bg-[#102117] border border-[#235F45] rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
 
               {/* Hero */}
               {selectedObjectForDetail.imageUrl && (
@@ -1019,6 +1068,12 @@ showToast(`${actionLabels[action]} "${object.title}".`);
               <div className="p-5 space-y-5">
 
                 <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-[10px] font-mono uppercase text-[#86935C]">
+                      {getObjectTypeMeta(selectedObjectForDetail.type).label}
+                    </span>
+                  </div>
+
                   <h2 className="text-2xl font-extrabold text-[#E2ECE5]">
                     {selectedObjectForDetail.title}
                   </h2>
@@ -1107,7 +1162,7 @@ showToast(`${actionLabels[action]} "${object.title}".`);
                         selectedObjectForDetail
                       )
                     }
-                    className="flex-1 py-3 rounded-xl bg-[#172D20] border border-[#235F45] text-[#8DCF74] font-extrabold text-xs flex items-center justify-center gap-2"
+                    className="flex-1 py-3 rounded-xl bg-[#172D20] border border-[#235F45] text-[#8DCF74] font-extrabold text-xs flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <Bookmark className="w-4 h-4" />
                     Save
@@ -1116,12 +1171,12 @@ showToast(`${actionLabels[action]} "${object.title}".`);
                   <button
                     onClick={() =>
                       showToast(
-                        `${getPrimaryAction(selectedObjectForDetail)} selected`
+                        `${getObjectActionLabel(selectedObjectForDetail.type)} â€” ${selectedObjectForDetail.title}`
                       )
                     }
-                    className="flex-[2] py-3 rounded-xl bg-[#00FF42] text-[#09150E] font-extrabold text-xs flex items-center justify-center gap-2"
+                    className="flex-[2] py-3 rounded-xl bg-[#00FF42] text-[#09150E] font-extrabold text-xs flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    {getPrimaryAction(selectedObjectForDetail)}
+                    {getObjectActionLabel(selectedObjectForDetail.type)}
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -1148,7 +1203,7 @@ showToast(`${actionLabels[action]} "${object.title}".`);
                             onClick={() =>
                               setSelectedObjectForDetail(related)
                             }
-                            className="text-left bg-[#09150E] border border-[#1E3A2A] hover:border-[#00FF42] rounded-xl p-3 transition"
+                            className="text-left bg-[#09150E] border border-[#1E3A2A] hover:border-[#00FF42] rounded-xl p-3 transition cursor-pointer"
                           >
                             <div className="flex gap-3">
                               {related.imageUrl && (
@@ -1181,10 +1236,8 @@ showToast(`${actionLabels[action]} "${object.title}".`);
         </div>
       )}
 
-      </main>
-
       <footer className="border-t border-[#1E3A2A] mt-12 py-6 text-xs text-[#86935C] text-center font-mono">
-        Brief 10.0 • Everything Happening Around You
+        Brief 10.0 â€¢ Everything Happening Around You
       </footer>
 
     </div>
