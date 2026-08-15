@@ -461,7 +461,20 @@ export function App() {
       return [...prev, newEdge];
     });
 
-    showToast(`Saved "${object.title}" to Local Layer.`);
+    const actionLabels: Record<ProtocolAction, string> = {
+  discover: 'Opened',
+  read: 'Opened',
+  save: 'Saved',
+  share: 'Shared',
+  contact: 'Contact started',
+  book: 'Booking started',
+  buy: 'Purchase started',
+  report: 'Reported',
+  verify: 'Verification started',
+  follow: 'Following',
+};
+
+showToast(`${actionLabels[action]} "${object.title}".`);
   };
 
   const filteredObjects = useMemo(() => {
