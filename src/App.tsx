@@ -25,6 +25,9 @@ import {
   User,
   Store,
   Landmark,
+  Sun,
+  Sunset,
+  CalendarDays,
   X
 } from 'lucide-react';
 
@@ -182,7 +185,7 @@ const INITIAL_OBJECTS: BriefObject[] = [
     isVerified: true,
     imageUrl: 'https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=1000&q=80',
     metadata: {
-      operatingHours: '06:00â€“18:30',
+      operatingHours: '06:00-18:30',
       statusBadge: 'Open Now',
       capacity: 1500,
       rating: 4.8,
@@ -205,7 +208,7 @@ const INITIAL_OBJECTS: BriefObject[] = [
     isVerified: true,
     imageUrl: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?auto=format&fit=crop&w=1000&q=80',
     metadata: {
-      operatingHours: '06:00â€“20:00',
+      operatingHours: '06:00-20:00',
       statusBadge: 'Open Access',
       capacity: 800,
       rating: 4.6,
@@ -251,7 +254,7 @@ const INITIAL_OBJECTS: BriefObject[] = [
     isVerified: true,
     imageUrl: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=80',
     metadata: {
-      operatingHours: '08:00â€“17:00',
+      operatingHours: '08:00-17:00',
       statusBadge: 'Verified Authority',
       contactPhone: '+254 700 000 111',
       rating: 4.3,
@@ -274,7 +277,7 @@ const INITIAL_OBJECTS: BriefObject[] = [
     isVerified: true,
     imageUrl: 'https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=1000&q=80',
     metadata: {
-      operatingHours: '07:00â€“18:00',
+      operatingHours: '07:00-18:00',
       statusBadge: 'Active Seller',
       contactPhone: '+254 712 345 678',
       rating: 4.9,
@@ -297,7 +300,7 @@ const INITIAL_OBJECTS: BriefObject[] = [
     isVerified: true,
     imageUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1000&q=80',
     metadata: {
-      operatingHours: 'Aug 15 â€¢ 09:00',
+      operatingHours: 'Aug 15, 09:00',
       statusBadge: 'Upcoming',
       capacity: 300,
       rating: 4.8,
@@ -615,9 +618,9 @@ export function App() {
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="w-2.5 h-2.5 rounded-full bg-[#00FF42] animate-ping" />
-              <span className="text-xs font-mono font-extrabold uppercase text-[#00FF42]">{selectedLocation} â€¢ Live Local Stream</span>
+              <span className="text-xs font-mono font-extrabold uppercase text-[#00FF42]">{selectedLocation} &middot; Live Local Stream</span>
             </div>
-            <h1 className="text-xl font-extrabold text-[#E2ECE5]">Brief â€” Everything Happening Around You</h1>
+            <h1 className="text-xl font-extrabold text-[#E2ECE5]">Brief &mdash; Everything Happening Around You</h1>
           </div>
           <div className="flex items-center gap-2 font-mono text-xs font-extrabold">
             <span className="bg-[#09150E] px-3 py-1.5 rounded-xl border border-[#235F45] text-[#00FF42]">{objects.length} Objects</span>
@@ -630,42 +633,39 @@ export function App() {
           <>
             {/* TEA */}
             <div className="mb-5">
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <div className="text-[11px] font-extrabold uppercase tracking-wider text-[#00FF42]">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-baseline gap-2 min-w-0">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#00FF42] shrink-0">
                     Today's Tea
-                  </div>
-                  <div className="text-sm font-bold text-[#E2ECE5]">
+                  </span>
+                  <span className="text-[11px] text-[#8DCF74] truncate">
                     What Nairobi is talking about
-                  </div>
+                  </span>
                 </div>
 
                 <button
                   onClick={() => showToast('Tea is brewing...')}
-                  className="text-[11px] font-extrabold text-[#8DCF74] border border-[#235F45] px-3 py-1.5 rounded-full"
+                  className="shrink-0 text-[10px] font-extrabold text-[#8DCF74] hover:text-[#00FF42] px-2 py-1 rounded-full cursor-pointer transition"
                 >
                   See all
                 </button>
               </div>
 
-              <div className="flex gap-3 overflow-x-auto no-scrollbar">
+              <div className="flex gap-2 overflow-x-auto no-scrollbar">
                 {[
-                  { label: 'Morning Tea', icon: 'â˜€ï¸' },
-                  { label: 'Evening Tea', icon: 'ðŸŒ†' },
-                  { label: 'Weekend Tea', icon: 'ðŸ—“ï¸' },
-                ].map((tea) => (
+                  { label: 'Morning', Icon: Sun },
+                  { label: 'Evening', Icon: Sunset },
+                  { label: 'Weekend', Icon: CalendarDays },
+                ].map(({ label, Icon }) => (
                   <button
-                    key={tea.label}
-                    onClick={() => showToast(`${tea.label} selected`)}
-                    className="shrink-0 bg-[#102117] border border-[#235F45] hover:border-[#00FF42] rounded-2xl px-4 py-3 text-left min-w-[145px] transition"
+                    key={label}
+                    onClick={() => showToast(`${label} Tea selected`)}
+                    className="shrink-0 flex items-center gap-1.5 bg-[#102117] border border-[#235F45] hover:border-[#00FF42] rounded-full px-3 py-1.5 transition cursor-pointer"
                   >
-                    <div className="text-lg mb-1">{tea.icon}</div>
-                    <div className="text-xs font-extrabold text-[#E2ECE5]">
-                      {tea.label}
-                    </div>
-                    <div className="text-[10px] text-[#8DCF74] mt-1">
-                      The stories people are discussing
-                    </div>
+                    <Icon className="w-3.5 h-3.5 text-[#00FF42] shrink-0" />
+                    <span className="text-[11px] font-extrabold text-[#E2ECE5] whitespace-nowrap">
+                      {label}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -1171,7 +1171,7 @@ export function App() {
                   <button
                     onClick={() =>
                       showToast(
-                        `${getObjectActionLabel(selectedObjectForDetail.type)} â€” ${selectedObjectForDetail.title}`
+                        `${getObjectActionLabel(selectedObjectForDetail.type)}: ${selectedObjectForDetail.title}`
                       )
                     }
                     className="flex-[2] py-3 rounded-xl bg-[#00FF42] text-[#09150E] font-extrabold text-xs flex items-center justify-center gap-2 cursor-pointer"
@@ -1237,7 +1237,7 @@ export function App() {
       )}
 
       <footer className="border-t border-[#1E3A2A] mt-12 py-6 text-xs text-[#86935C] text-center font-mono">
-        Brief 10.0 â€¢ Everything Happening Around You
+        Brief 10.0 &middot; Everything Happening Around You
       </footer>
 
     </div>
