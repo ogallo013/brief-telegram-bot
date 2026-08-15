@@ -973,6 +973,213 @@ showToast(`${actionLabels[action]} "${object.title}".`);
     </div>
   </section>
 )}
+      {/* DETAIL LAYER */}
+      {selectedObjectForDetail && (
+        <div
+          className="fixed inset-0 z-50 bg-[#09150E]/90 backdrop-blur-md overflow-y-auto"
+          onClick={() => setSelectedObjectForDetail(null)}
+        >
+          <div
+            className="min-h-screen flex items-end sm:items-center justify-center p-0 sm:p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-full max-w-2xl bg-[#102117] border border-[#235F45] rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl">
+
+              {/* Hero */}
+              {selectedObjectForDetail.imageUrl && (
+                <div className="relative h-56 sm:h-72">
+                  <img
+                    src={selectedObjectForDetail.imageUrl}
+                    alt={selectedObjectForDetail.title}
+                    className="w-full h-full object-cover"
+                  />
+
+                  <button
+                    onClick={() => setSelectedObjectForDetail(null)}
+                    className="absolute top-4 right-4 p-2 rounded-full bg-[#09150E]/80 text-[#E2ECE5] border border-[#235F45]"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+
+                  <div className="absolute bottom-4 left-4 flex gap-2">
+                    <span className="text-[10px] font-extrabold uppercase px-3 py-1 rounded-full bg-[#09150E]/85 text-[#00FF42] border border-[#235F45]">
+                      {selectedObjectForDetail.category}
+                    </span>
+
+                    {selectedObjectForDetail.isVerified && (
+                      <span className="text-[10px] font-extrabold px-3 py-1 rounded-full bg-[#00FF42] text-[#09150E]">
+                        Verified
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Details */}
+              <div className="p-5 space-y-5">
+
+                <div>
+                  <h2 className="text-2xl font-extrabold text-[#E2ECE5]">
+                    {selectedObjectForDetail.title}
+                  </h2>
+
+                  <p className="text-sm text-[#8DCF74] mt-2 leading-relaxed">
+                    {selectedObjectForDetail.summary}
+                  </p>
+                </div>
+
+                {/* Facts */}
+                <div className="grid grid-cols-2 gap-3">
+
+                  {selectedObjectForDetail.locationName && (
+                    <div className="bg-[#09150E] border border-[#1E3A2A] rounded-xl p-3">
+                      <MapPin className="w-4 h-4 text-[#00FF42] mb-2" />
+                      <div className="text-[10px] uppercase text-[#86935C]">
+                        Location
+                      </div>
+                      <div className="text-xs font-bold mt-1">
+                        {selectedObjectForDetail.locationName}
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedObjectForDetail.metadata?.operatingHours && (
+                    <div className="bg-[#09150E] border border-[#1E3A2A] rounded-xl p-3">
+                      <Clock className="w-4 h-4 text-[#00FF42] mb-2" />
+                      <div className="text-[10px] uppercase text-[#86935C]">
+                        When
+                      </div>
+                      <div className="text-xs font-bold mt-1">
+                        {selectedObjectForDetail.metadata.operatingHours}
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedObjectForDetail.metadata?.price !== undefined && (
+                    <div className="bg-[#09150E] border border-[#1E3A2A] rounded-xl p-3">
+                      <Tag className="w-4 h-4 text-[#00FF42] mb-2" />
+                      <div className="text-[10px] uppercase text-[#86935C]">
+                        Price
+                      </div>
+                      <div className="text-xs font-bold mt-1">
+                        {selectedObjectForDetail.metadata.currency || 'KES'}{' '}
+                        {selectedObjectForDetail.metadata.price.toLocaleString()}
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedObjectForDetail.creatorName && (
+                    <div className="bg-[#09150E] border border-[#1E3A2A] rounded-xl p-3">
+                      <User className="w-4 h-4 text-[#00FF42] mb-2" />
+                      <div className="text-[10px] uppercase text-[#86935C]">
+                        Source
+                      </div>
+                      <div className="text-xs font-bold mt-1">
+                        {selectedObjectForDetail.creatorName}
+                      </div>
+                    </div>
+                  )}
+
+                </div>
+
+                {/* Trust */}
+                {selectedObjectForDetail.trustScore !== undefined && (
+                  <div className="flex items-center justify-between bg-[#09150E] border border-[#1E3A2A] rounded-xl px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4 text-[#00FF42]" />
+                      <span className="text-xs font-bold">
+                        Information trust
+                      </span>
+                    </div>
+
+                    <span className="text-sm font-extrabold text-[#00FF42]">
+                      {selectedObjectForDetail.trustScore}%
+                    </span>
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() =>
+                      handleExecuteProtocolAction(
+                        'save',
+                        selectedObjectForDetail
+                      )
+                    }
+                    className="flex-1 py-3 rounded-xl bg-[#172D20] border border-[#235F45] text-[#8DCF74] font-extrabold text-xs flex items-center justify-center gap-2"
+                  >
+                    <Bookmark className="w-4 h-4" />
+                    Save
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      showToast(
+                        `${getPrimaryAction(selectedObjectForDetail)} selected`
+                      )
+                    }
+                    className="flex-[2] py-3 rounded-xl bg-[#00FF42] text-[#09150E] font-extrabold text-xs flex items-center justify-center gap-2"
+                  >
+                    {getPrimaryAction(selectedObjectForDetail)}
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Related */}
+                {getRelatedObjects(selectedObjectForDetail).length > 0 && (
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <div className="text-[10px] font-mono uppercase text-[#00FF42]">
+                          Explore more
+                        </div>
+                        <h3 className="text-sm font-extrabold">
+                          Similar & nearby
+                        </h3>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {getRelatedObjects(selectedObjectForDetail).map(
+                        (related) => (
+                          <button
+                            key={related.id}
+                            onClick={() =>
+                              setSelectedObjectForDetail(related)
+                            }
+                            className="text-left bg-[#09150E] border border-[#1E3A2A] hover:border-[#00FF42] rounded-xl p-3 transition"
+                          >
+                            <div className="flex gap-3">
+                              {related.imageUrl && (
+                                <img
+                                  src={related.imageUrl}
+                                  alt=""
+                                  className="w-14 h-14 rounded-lg object-cover shrink-0"
+                                />
+                              )}
+
+                              <div className="min-w-0">
+                                <div className="text-[9px] uppercase text-[#86935C]">
+                                  {related.category}
+                                </div>
+                                <div className="text-xs font-extrabold mt-1 line-clamp-2">
+                                  {related.title}
+                                </div>
+                              </div>
+                            </div>
+                          </button>
+                        )
+                      )}
+                    </div>
+                  </div>
+                )}
+
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       </main>
 
